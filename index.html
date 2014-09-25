@@ -50,7 +50,7 @@
       }
 
       .row:hover {
-        background: #eef;
+        background: #2ad2fc;
       }
 
       .repl .command {
@@ -66,9 +66,19 @@
     </div>
     <script>
       function sendCommand(command, nolog) {
+
+        if (command.substr(0,4) === 'repl') {
+          replCommand(command);
+          return;
+        }
+
+        if (command.indexOf('screen=') === -1 && defaultScreen) {
+          command += ' screen=' + defaultScreen;
+        }
+
         var xhr = new XMLHttpRequest();
         xhr.open('POST', 'http://airmozilla-ops2.corpdmz.scl3.mozilla.com/api/command', true);
-        // xhr.setRequestHeader
+
         xhr.send(
           new Blob(
             [JSON.stringify({raw:command})],
@@ -82,14 +92,13 @@
           logCommand(command);
         }
 
-        input.value = '';
-
       }
 
       var input = document.querySelector('.command');
       var log = document.querySelector('.log');
       var historyPos = -1;
       var commands;
+      var defaultScreen = localStorage.getItem('defaultscreen');
 
       try {
         commands = JSON.parse(localStorage.getItem('history'));
@@ -102,6 +111,7 @@
         var command = input.value;
         if (e.key === 'Enter') {
           sendCommand(command);
+          input.value = '';
           e.preventDefault();
         }
         if (e.key === 'Up') {
@@ -148,9 +158,20 @@
         log.appendChild(row);
       }
 
+      function replCommand(command) {
+        command = command.trim().split(/\s+/);
+        switch (command[1].toLowerCase()) {
+          case 'defaultscreen':
+            defaultScreen = command[2];
+            localStorage.setItem('defaultscreen', defaultScreen);
+            break;
+        }
+      }
+
       if (!(commands instanceof Array)) {
         commands = [];
       }
+
 
       commands.forEach(logCommand);
     </script>
