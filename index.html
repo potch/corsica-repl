@@ -111,6 +111,7 @@
         var command = input.value;
         if (e.key === 'Enter') {
           sendCommand(command);
+          historyPos = -1;
           input.value = '';
           e.preventDefault();
         }
