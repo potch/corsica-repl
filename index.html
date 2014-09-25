@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      .repl {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+      }
+
+      body {
+        background: #eee;
+      }
+
+      .log {
+        margin: 0;
+      }
+
+      .repl .row, .repl .command {
+        margin: 0;
+        font-family: monospace;
+        font-size: 24px;
+        border: 0;
+        padding: 8px 16px;
+      }
+
+      .row {
+        position: relative;
+      }
+
+      .row .resend {
+        font-family: monospace;
+        display: none;
+        position: absolute;
+        top: 50%;
+        transform: translate(0,-50%);
+        right: 16px;
+        font-size: 24px;
+        border: 1px solid black;
+        cursor: pointer;
+      }
+      .row:hover .resend {
+        display: block;
+      }
+
+      .repl .command {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="repl">
+      <pre class="log">
+      </pre>
+      <input class="command"/>
+    </div>
+    <script>
+      function sendCommand(command, nolog) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'http://airmozilla-ops2.corpdmz.scl3.mozilla.com/api/command', true);
+        // xhr.setRequestHeader
+        xhr.send(
+          new Blob(
+            [JSON.stringify({raw:command})],
+            {'type': 'application/json'}
+          )
+        );
+
+        if (!nolog) {
+          commands.push(command);
+          localStorage.setItem('history', JSON.stringify(commands));
+          logCommand(command);
+        }
+
+        input.value = '';
+
+      }
+
+      var input = document.querySelector('.command');
+      var log = document.querySelector('.log');
+      var historyPos = -1;
+      var commands;
+
+      try {
+        commands = JSON.parse(localStorage.getItem('history'));
+      } catch (e) {
+        console.log('eff');
+        commands = [];
+      }
+
+      input.addEventListener('keypress', function (e) {
+        var command = input.value;
+        if (e.key === 'Enter') {
+          sendCommand(command);
+          e.preventDefault();
+        }
+        if (e.key === 'Up') {
+          e.preventDefault();
+          historyPos++;
+          if (historyPos > commands.length - 1) {
+            historyPos = -1;
+          }
+          fromHistory();
+        }
+        if (e.key === 'Down') {
+          e.preventDefault();
+          historyPos--;
+          if (historyPos < -1) {
+            historyPos = -1;
+          }
+          fromHistory();
+        }
+      });
+
+      function fromHistory() {
+        if (historyPos > -1) {
+          input.value = commands[commands.length - 1 - historyPos];
+        } else {
+          input.value = '';
+        }
+      }
+
+      log.addEventListener('click', function (e) {
+        if (e.target.className === 'resend') {
+          sendCommand(e.target.parentNode.getAttribute('data-command'), true);
+        }
+      });
+
+      function logCommand(command) {
+        var row = document.createElement('div');
+        row.className = 'row';
+        row.setAttribute('data-command', command);
+        row.appendChild(document.createTextNode(command));
+        var resend = document.createElement('button');
+        resend.className = 'resend';
+        resend.innerHTML = 'resend';
+        row.appendChild(resend);
+        log.appendChild(row);
+      }
+
+      if (!(commands instanceof Array)) {
+        commands = [];
+      }
+
+      commands.forEach(logCommand);
+    </script>
+  </body>
+</html>
