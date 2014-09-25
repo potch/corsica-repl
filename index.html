@@ -72,6 +72,12 @@
           return;
         }
 
+        if (!nolog) {
+          commands.push(command);
+          localStorage.setItem('history', JSON.stringify(commands));
+          logCommand(command);
+        }
+
         if (command.indexOf('screen=') === -1 && defaultScreen) {
           command += ' screen=' + defaultScreen;
         }
@@ -85,12 +91,6 @@
             {'type': 'application/json'}
           )
         );
-
-        if (!nolog) {
-          commands.push(command);
-          localStorage.setItem('history', JSON.stringify(commands));
-          logCommand(command);
-        }
 
       }
 
