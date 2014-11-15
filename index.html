@@ -43,16 +43,19 @@
         position: relative;
       }
 
-      .row .resend {
+      button {
         font-family: monospace;
+        font-size: 24px;
+        border: 1px solid black;
+        cursor: pointer;
+      }
+
+      .row .resend {
         display: none;
         position: absolute;
         top: 50%;
         transform: translate(0,-50%);
         right: 16px;
-        font-size: 24px;
-        border: 1px solid black;
-        cursor: pointer;
       }
       .row:hover .resend {
         display: block;
@@ -64,6 +67,10 @@
 
       .repl .command {
         width: 100%;
+        flex: 1;
+      }
+      .form {
+        display: flex;
       }
     </style>
   </head>
@@ -71,7 +78,7 @@
     <div class="repl">
       <pre class="log">
       </pre>
-      <input class="command"/>
+      <div class="form"><input class="command"/><button class="go">go</button></div>
     </div>
     <script>
       function sendCommand(command, nolog) {
@@ -122,12 +129,18 @@
         commands = [];
       }
 
-      input.addEventListener('keypress', function (e) {
+      function submit() {
         var command = input.value;
+        sendCommand(command);
+        historyPos = -1;
+        input.value = '';
+      }
+
+      document.querySelector('.go').addEventListener('click', submit);
+
+      input.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
-          sendCommand(command);
-          historyPos = -1;
-          input.value = '';
+          submit();
           e.preventDefault();
         }
         if (e.key === 'Up') {
