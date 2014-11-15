@@ -131,9 +131,11 @@
 
       function submit() {
         var command = input.value;
-        sendCommand(command);
-        historyPos = -1;
-        input.value = '';
+        if (command) {
+          sendCommand(command);
+          historyPos = -1;
+          input.value = '';          
+        }
       }
 
       document.querySelector('.go').addEventListener('click', submit);
