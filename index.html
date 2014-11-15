@@ -11,13 +11,17 @@
       html, body {
         margin: 0;
         padding: 0;
+        height: 100%;
       }
 
       .repl {
         position: absolute;
-        bottom: 0;
+        top: 0;
         left: 0;
         width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
       }
 
       body {
@@ -29,6 +33,8 @@
 
       .log {
         margin: 0;
+        flex: 1;
+        overflow: scroll;
       }
 
       .repl .row, .repl .command {
@@ -134,7 +140,7 @@
         if (command) {
           sendCommand(command);
           historyPos = -1;
-          input.value = '';          
+          input.value = '';
         }
       }
 
@@ -190,6 +196,7 @@
         resend.innerHTML = 'resend';
         row.appendChild(resend);
         log.appendChild(row);
+        log.scrollTop = log.scrollHeight;
       }
 
       function replCommand(command) {
