@@ -173,7 +173,8 @@
         if (e.target.className === 'resend') {
           sendCommand(e.target.parentNode.getAttribute('data-command'), true);
         } else if (e.target.className === 'row') {
-          input.value = e.target.parentNode.getAttribute('data-command');
+          input.value = e.target.getAttribute('data-command');
+          input.focus();
         }
       });
 
