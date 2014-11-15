@@ -85,12 +85,12 @@
     <div class="repl">
       <pre class="log">
       </pre>
-      <div class="form"><input class="command"/><button class="go">go</button></div>
+      <div class="form"><input class="command" type="url"/><button class="go">go</button></div>
     </div>
     <script>
       function sendCommand(command, nolog) {
 
-        if (command.substr(0,4) === 'repl') {
+        if (command.substr(0,5).toLowerCase() === 'repl ') {
           replCommand(command);
           return;
         }
