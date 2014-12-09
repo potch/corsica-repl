@@ -38,7 +38,7 @@
         overflow-x: hidden;
       }
 
-      .repl .row, .repl .command {
+      .repl .row, .repl .command, .screen {
         margin: 0;
         font-family: monospace;
         font-size: 24px;
@@ -79,13 +79,18 @@
       .form {
         display: flex;
       }
+
+      .screen {
+        border: 1px solid black;
+      }
+
     </style>
   </head>
   <body>
     <div class="repl">
       <pre class="log">
       </pre>
-      <div class="form"><input class="command" type="url"/><button class="go">go</button></div>
+      <div class="form"><input class="command"/><select class="screen"></select><button class="go">go</button></div>
     </div>
     <script>
       function sendCommand(command, nolog) {
@@ -121,6 +126,42 @@
 
       }
 
+      function getCensus(cb) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', server + 'api/census.clients', true);
+        xhr.onload = function () {
+          cb(JSON.parse(xhr.response));
+        };
+        xhr.send();
+      }
+
+      var select = document.querySelector('.screen');
+
+      function updateSelect(census) {
+        var clients = census.clients;
+        while (select.childNodes.length) {
+          select.firstChild.remove();
+        }
+        clients.sort();
+        clients.unshift('');
+        clients.forEach(function (c) {
+          var o = document.createElement('option');
+          if (c === defaultScreen) {
+            o.setAttribute('selected', true);
+          }
+          o.value = c;
+          o.innerHTML = c;
+          select.appendChild(o);
+        });
+        setTimeout(function () {
+          getCensus(updateSelect);
+        }, 30 * 1000);
+      }
+
+      select.addEventListener('change', function (e) {
+        defaultScreen = select.value;
+        localStorage.setItem('defaultscreen', defaultScreen);
+      });
 
       var input = document.querySelector('.command');
       var log = document.querySelector('.log');
@@ -224,6 +265,7 @@
       }
 
       commands.forEach(logCommand);
+      getCensus(updateSelect);
     </script>
   </body>
 </html>
