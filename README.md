@@ -20,7 +20,7 @@ Connect to a Corsica instance:
 
 > repl server [server]
 
-Be sure to use the fully qualified URL of the server, including protocol.
+Be sure to use the fully qualified URL of the server, including protocol. Server information is stored in localStorage, so you should only have to do this when you change servers.
 
 If you refresh the page, the dropdown should be populated with a list of screens connected to the server.
 
