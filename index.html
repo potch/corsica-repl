@@ -93,6 +93,39 @@
       <div class="form"><input class="command"/><select class="screen"></select><button class="go">go</button></div>
     </div>
     <script>
+
+      var fileEl = document.createElement('input');
+      fileEl.setAttribute('type', 'file');
+      fileEl.addEventListener('change', read);
+
+      function read() {
+        if (!fileEl.files.length) {
+          return;
+        }
+        var file = fileEl.files[0];
+        if (file.type.split('/')[1] !== 'json') {
+          error('please select a JSON file.');
+          return;
+        }
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            var data = JSON.parse(e.target.result);
+            if (data instanceof Array) {
+              commands = commands.concat(data);
+              data.forEach(logCommand);
+              localStorage.setItem('history', JSON.stringify(commands));
+              error('commands imported successfuly.');
+            } else {
+              error('improperly formatted command data.');
+            }
+          } catch (e) {
+            error('error importing commands:'  + e.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+
       function sendCommand(command, nolog) {
 
         if (command.substr(0,5).toLowerCase() === 'repl ') {
@@ -170,13 +203,6 @@
       var defaultScreen = localStorage.getItem('defaultscreen');
       var server = localStorage.getItem('server');
 
-      try {
-        commands = JSON.parse(localStorage.getItem('history'));
-      } catch (e) {
-        console.log('eff');
-        commands = [];
-      }
-
       function submit() {
         var command = input.value;
         if (command) {
@@ -240,13 +266,19 @@
         log.appendChild(row);
         log.scrollTop = log.scrollHeight;
       }
-      
+
       function appendRow(...elements) {
         var row = document.createElement('div');
         row.className = 'row';
         elements.forEach(row.appendChild.bind(row));
         log.appendChild(row);
         log.scrollTop = log.scrollHeight;
+      }
+
+      function error(text) {
+        var el = document.createElement('em');
+        el.appendChild(document.createTextNode(text));
+        appendRow(el);
       }
 
       function replCommand(command) {
@@ -269,12 +301,26 @@
             link.setAttribute('href', window.URL.createObjectURL(blob));
             appendRow(link);
             break;
+          case 'import':
+            var link = document.createElement('a');
+            link.setAttribute('href', '#');
+            link.innerHTML = 'click here to import commands';
+            fileEl.click();
+            break;
           case 'clear':
             commands = [];
             log.innerHTML = '';
             localStorage.setItem('history', '[]');
             break;
         }
+      }
+
+      var commands;
+      try {
+        commands = JSON.parse(localStorage.getItem('history'));
+      } catch (e) {
+        console.warn('history data is invalid');
+        commands = [];
       }
 
       if (!(commands instanceof Array)) {
