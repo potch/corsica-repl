@@ -240,6 +240,14 @@
         log.appendChild(row);
         log.scrollTop = log.scrollHeight;
       }
+      
+      function appendRow(...elements) {
+        var row = document.createElement('div');
+        row.className = 'row';
+        elements.forEach(row.appendChild.bind(row));
+        log.appendChild(row);
+        log.scrollTop = log.scrollHeight;
+      }
 
       function replCommand(command) {
         command = command.trim().split(/\s+/);
@@ -257,8 +265,9 @@
             var blob = new Blob([output], {type : 'application/json'});
             var link = document.createElement('a');
             link.setAttribute('download', 'commands.json');
+            link.innerHTML = 'click here to download your commands';
             link.setAttribute('href', window.URL.createObjectURL(blob));
-            link.click();
+            appendRow(link);
             break;
           case 'clear':
             commands = [];
