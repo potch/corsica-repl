@@ -252,6 +252,14 @@
             server = command[2];
             localStorage.setItem('server', server);
             break;
+          case 'export':
+            var output = JSON.stringify(commands, null, 2);
+            var blob = new Blob(output, {type : 'application/json'});
+            var link = document.createElement('a');
+            link.setAttribute('download', 'commands.json');
+            link.setAttribute('href', window.URL.createObjectURL(blob));
+            link.click();
+            break;
           case 'clear':
             commands = [];
             log.innerHTML = '';
