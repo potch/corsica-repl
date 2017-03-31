@@ -167,9 +167,15 @@
         var xhr = new XMLHttpRequest();
         xhr.open('POST', server + 'api/census.clients', true);
         xhr.onload = function () {
-          cb(JSON.parse(xhr.response));
+          try {
+            cb(JSON.parse(xhr.response));
+          } catch (e) {
+            error();
+          }
         };
-        xhr.onerror = function () {
+        xhr.onerror = error;
+
+        function error() {
           var msg = document.createElement('i');
           msg.innerHTML = 'failed to get screen list from server: ' + server;
           appendRow(msg);
