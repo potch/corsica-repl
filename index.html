@@ -190,7 +190,7 @@
       function updateSelect(census) {
         var clients = census.clients;
         while (select.childElementCount > 1) {
-          select.firstChildElement.remove();
+          select.firstElementChild.remove();
         }
         clients.sort();
         clients.forEach(function (c) {
