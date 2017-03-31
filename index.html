@@ -172,6 +172,9 @@
             cb(JSON.parse(xhr.response));
           } catch (e) {
             error('failed to get screen list from server: ' + server);
+            if (e) {
+              error(e);
+            }
           }
         };
 
