@@ -90,13 +90,21 @@
     <div class="repl">
       <pre class="log">
       </pre>
-      <div class="form"><input class="command"/><select class="screen"></select><button class="go">go</button></div>
+      <div class="form">
+        <input class="command" placeholder="enter command">
+        <select class="screen">
+          <option value="" disabled selected>select screen</option>
+        </select>
+        <button class="go">go</button>
+      </div>
     </div>
     <script>
 
       var fileEl = document.createElement('input');
       fileEl.setAttribute('type', 'file');
       fileEl.addEventListener('change', read);
+
+      var searchParams = (new URL(window.location)).searchParams;
 
       function read() {
         if (!fileEl.files.length) {
@@ -143,10 +151,6 @@
           command += ' screen=' + defaultScreen;
         }
 
-        if (!server) {
-          server = 'http://airmozilla-ops2.corpdmz.scl3.mozilla.com/';
-        }
-
         var xhr = new XMLHttpRequest();
         xhr.open('POST', server + 'api/command', true);
 
@@ -165,6 +169,11 @@
         xhr.onload = function () {
           cb(JSON.parse(xhr.response));
         };
+        xhr.onerror = function () {
+          var msg = document.createElement('i');
+          msg.innerHTML = 'failed to get screen list from server: ' + server;
+          appendRow(msg);
+        };
         xhr.send();
       }
 
@@ -172,11 +181,10 @@
 
       function updateSelect(census) {
         var clients = census.clients;
-        while (select.childNodes.length) {
-          select.firstChild.remove();
+        while (select.childElementCount > 1) {
+          select.firstChildElement.remove();
         }
         clients.sort();
-        clients.unshift('');
         clients.forEach(function (c) {
           var o = document.createElement('option');
           if (c === defaultScreen) {
@@ -201,7 +209,7 @@
       var historyPos = -1;
       var commands;
       var defaultScreen = localStorage.getItem('defaultscreen');
-      var server = localStorage.getItem('server');
+      var server = searchParams.get('server') || localStorage.getItem('server');
 
       function submit() {
         var command = input.value;
@@ -291,6 +299,7 @@
           case 'server':
             server = command[2];
             localStorage.setItem('server', server);
+            getCensus(updateSelect);
             break;
           case 'export':
             var output = JSON.stringify(commands, null, 2);
