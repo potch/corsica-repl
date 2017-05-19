@@ -147,7 +147,7 @@
           logCommand(command);
         }
 
-        if (command.indexOf('screen=') === -1 && defaultScreen) {
+        if (command.indexOf(' screen=') === -1 && defaultScreen) {
           command += ' screen=' + defaultScreen;
         }
 
